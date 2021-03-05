@@ -34,6 +34,9 @@
 <script src="/vendor/bootstrap/js/bootstrap.js"></script>
 <script>
 
+    var randomNumber = getRandomInt(1, 4);
+    var randomColor = randomColorSelect(randomNumber);
+
     var socket = io("http://localhost:4000");
 
     socket.emit("login", () => {
@@ -44,8 +47,14 @@
         console.log("Desconectado");
     })
 
-    var randomNumber = getRandomInt(1, 4);
-    var randomColor = randomColorSelect(randomNumber);
+    socket.on("previousMessages", function(messages){
+        for (message of messages){
+            var chat = document.getElementById("chat");
+            var div = document.createElement("div");
+            div.innerHTML = "<p><a class='" + message.color + "'>" + message.username + ": </a>" + message.msg + "</p>";
+            chat.append(div);
+        }
+    });
 
     socket.on("showmsg", (data) => {
         var chat = document.getElementById("chat");

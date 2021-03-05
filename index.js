@@ -3,9 +3,9 @@ var app = express();
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
 
+let messages = [];
+
 io.on("connection", (socket) => {
-    
-    //console.log(socket);
 
     socket.on("login", () => {
         console.log(socket.id + " conectou");
@@ -15,7 +15,12 @@ io.on("connection", (socket) => {
         console.log(socket.id + " desconectou");
     })
 
+    //Emite mensagens antigas para todos
+    socket.emit("previousMessages", messages);
+
+    //Recebe mensagem e emite para todos
     socket.on("msg", (data) => {
+        messages.push(data);
         io.emit("showmsg", data);
     })
 
