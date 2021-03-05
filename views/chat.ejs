@@ -4,35 +4,75 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.css">
     <title>Chat</title>
 </head>
 <body>
-    <input type="text" name="" id="msg" placeholder="Digite sua mensagem">
-    <input type="text" name="" id="username" placeholder="Nome de usuário">
-    <button onclick="enviar()">Enviar</button>
-    <div id="chat"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <h1 class="text-info mt-5 mb-3">Realtime Chat - Socket IO</h1>
+                <input class="form-control mb-3" type="text" name="" id="username" placeholder="Nome de usuário">
+                <input class="form-control mb-3" type="text" name="" id="msg" placeholder="Digite sua mensagem">
+                <button class="btn btn-primary mb-3" onclick="enviar()">Enviar mensagem</button>
+            </div>
+            <div class="col-6">
+                <h1 class="text-info mt-5 mb-3">Chat</h1>     
+                <div class="card">
+                    <div class="card-body">
+                        <div id="chat"></div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 <!-- Scripts client socket.io -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js"></script>
+<script src="/vendor/bootstrap/js/jquery-3.2.1.slim.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.js"></script>
 <script>
 
     var socket = io("http://localhost:4000");
 
     socket.emit("login", () => {
-        console.log("Login realizado");
+        console.log("Login realizado"); 
     });
 
     socket.on("disconnect", () => {
         console.log("Desconectado");
     })
 
+    var randomNumber = getRandomInt(1, 4);
+    var randomColor = randomColorSelect(randomNumber);
+
     socket.on("showmsg", (data) => {
         var chat = document.getElementById("chat");
-        var p = document.createElement("p");
-        p.innerHTML = data.username + ": " + data.msg;
-        chat.append(p);
+        var div = document.createElement("div");
+        div.innerHTML = "<p><a class='" + data.color + "'>" + data.username + ": </a>" + data.msg + "</p>";
+        chat.append(div);
     })
+
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    function randomColorSelect(id) {
+        if(id==1){
+            randomColor = 'text-primary';
+        }else if(id==2){
+            randomColor = 'text-success';
+        }else if(id==3){
+            randomColor = 'text-info';
+        }else{
+            randomColor = 'text-danger';
+        }
+        return randomColor;
+    }
+
 
     function enviar(){
 
@@ -40,7 +80,8 @@
         var usernameField = document.getElementById("username");
         var msg = msgField.value;
         var username = usernameField.value;
-        socket.emit("msg", {msg: msg, username: username});
+        var color = randomColor;
+        socket.emit("msg", {msg: msg, username: username, color: color});
 
     }  
 
